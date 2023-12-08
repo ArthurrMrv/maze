@@ -22,7 +22,7 @@ class Menue():
         turtle.goto(-250, 0)
         
         for i in range(menue_duration):
-            turtle.write(f"The program will start in {menue_duration-i}s:\nSPACE : for solving a random start to end path\nRIGHTARROW : for changing the maze\nQ : for quit", font=("Arial", 24, "normal"))
+            turtle.write(f"The program will start in {menue_duration-i}s:\nSPACE : for solving a random start to end path\nC: Normal maze solution (bottum to top)\nRIGHTARROW : for changing the maze\nQ : for quit", font=("Arial", 24, "normal"))
             time.sleep(1)
             turtle.clear()
 
