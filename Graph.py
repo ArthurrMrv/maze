@@ -27,7 +27,7 @@ class Graph:
         #If the node to add is already in the graph or does not corresponds to an existing cell of the maze grid, returns the actual graph without modifications
         if (point in self.get_keys()) or not(point[0]%2 and point[1]%2) or \
             not(0 <= point[0] < len(self.origin[0]) and 0 <= point[1] < len(self.origin)):
-            return self
+                return self
         
         #Else we check in which direction we can go from this point
         map_two[point] = {

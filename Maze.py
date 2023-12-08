@@ -100,9 +100,11 @@ class Maze:
 
         #Create a copy of the graph, add start and end nodes to it
         nest_graph: Graph = self.graph.copy()
+ 
         nest_graph = nest_graph + start
-        nest_graph = nest_graph + end
 
+        nest_graph = nest_graph + end
+    
         #Check if a solution for the given start and end nodes have already been calculated, if so returns that solution
         if (start, end) in self.solutions.keys():
             return self.solutions[(start, end)]

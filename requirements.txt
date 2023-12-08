@@ -1,0 +1,10 @@
+# requirements.txt
+
+# Turtle graphics library for visualization
+# This is a built-in library in Python
+# No specific version needed as it comes with Python
+# Remove this line if you want
+turtle
+
+# tqdm library for progress bar (optional, can be uncommented if needed)
+# tqdm==4.62.3

@@ -9,11 +9,12 @@ class Menue():
     Runing = False
     
     def __init__(self, menue_duration = 15, w = 600, h = 600) -> None:
-        self.w, self.h = w, h
-        self.screen = self.turt_init(800, 800)
+        self.w, self.h = max(w, 0) , max(h, 0)
+        self.mw, self.mh = max(w-100, 0), max(h, 0)
+        self.screen = self.turt_init()
         self.cell_width = None
-        self.m = None
-    
+        self.m = Maze(42)
+        
         #Show usefull informations to the user, such as the commands to use 
         turtle.hideturtle()
         turtle.speed(0)
@@ -24,17 +25,36 @@ class Menue():
             turtle.write(f"The program will start in {menue_duration-i}s:\nSPACE : for solving a random start to end path\nRIGHTARROW : for changing the maze\nQ : for quit", font=("Arial", 24, "normal"))
             time.sleep(1)
             turtle.clear()
+
+        self.maze_walls, self.cell_width = self.turt_maze()
             
+    def done(self):
+        turtle.done()
+    
+    def listen(self):
+        self.screen.listen()
+        
+
     def turt_init(self):
+        """Initialise the trutle window
+
+        Returns:
+            _type_: _description_
+        """
         # Set up the turtle screen
         screen = turtle.Screen()
         screen.title("Maze")
-        screen.setup(width=self.w, height=self.h)
+        screen.setup(width=self.mw, height=self.mh)
         return screen
-    
-    def turt_maze(self, m : Maze): #maze_walls, cell_width = turt_maze(screen, m.get_grid())
-        maze = m.get_grid()
-        screen.tracer(0)  # Turn off screen updates to speed up rendering
+        
+    def turt_maze(self): #maze_walls, cell_width = turt_maze(screen, m.get_grid())
+        """Show the maze on the window screen
+
+        Returns:
+            _type_: _description_
+        """
+        maze = self.m.get_grid()
+        self.screen.tracer(0)  # Turn off screen updates to speed up rendering
         
         # Calculate cell size based on maze dimensions
         rows = len(maze)
@@ -60,7 +80,7 @@ class Menue():
             
             for (x, y) in ((x, y) for x in range(cols) for y in range(rows)):
                     if maze[y][x] == 1:
-                        x_coord = x * cell_width - (w//2)
+                        x_coord = x * cell_width - (self.w//2)
                         y_coord = (self.h//2) - (y + 1) * cell_height
                         walls.append(draw_wall(x_coord, y_coord))
             return walls
@@ -78,8 +98,16 @@ class Menue():
     
     # Function to show a path on the maze window
     def turt_draw_path(self, path):
+        """Draw best path
 
-        self.clear_tempObj()
+        Args:
+            path (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        
+        
         def draw_points(x, y, color):
             wall = turtle.Turtle()
             wall.hideturtle()
@@ -105,7 +133,8 @@ class Menue():
             draw_points((path[-1][0] * self.cell_width - (self.w//2)), ((self.h//2) - (path[-1][1] + 1) * self.cell_width), "blue")]
         
         path_turtle.pensize(3)
-        path_turtle.speed(min(((self.w//self.cell_width)//100)*3, 10))
+        #path_turtle.speed(min(((self.w//self.cell_width)//100)*3, 10))
+        path_turtle.speed(0)
         path_turtle.penup()
         path_turtle.color("red")
         
@@ -150,6 +179,14 @@ class Menue():
     
     def onkeypress(self, fun, key=None):
         self.screen.onkeypress(fun, key)
+        
+    def onscreenclick(self, fun, btn=1, add=None):
+        self.screen.onscreenclick(fun, btn, add)
+        
+    def get_mouse_click_coor(self, x,y)->tuple:
+        "Start button implementation"
+        turtle.onscreenclick(self.get_mouse_click_coor)
+        #print(x, y)
     
     def bye(self):
         self.screen.bye()
@@ -170,7 +207,7 @@ class Menue():
                 w.clear()
             
             self.m = Maze(int(self.screen.numinput("Please enter a maze size", "", 42, minval=7, maxval=500)/2)) #Max : 250 due to screen size and screen resolution
-            self.maze_walls, self.cell_width = self.turt_maze(self.screen, self.m.get_grid())
+            self.maze_walls, self.cell_width = self.turt_maze()
             
             self.screen.update()
             self.screen.tracer(1)  # Re-enable screen updates
@@ -184,7 +221,49 @@ class Menue():
             self.clear_tempObj()
             start = random.choice(tuple((x, y) for x in range(1, self.m.length, 2) for y in range(1, self.m.width, 2)))
             end = random.choice(tuple((x, y) for x in range(1, self.m.length, 2) for y in range(1, self.m.width, 2)))
-            self.turt_draw_path(self.screen,  self.m.find_sol(start, end), self.cell_width)
+            self.turt_draw_path(self.m.find_sol(start, end))
+            self.screen.listen()
+            self.Runing = False
+    
+    def classic(self):
+        if not self.Runing:
+            start = (1, self.m.width-1)
+            end = (self.m.length-1, 1)
+            
+            maze = self.m.get_grid()
+            self.screen.tracer(0)  # Turn off screen updates to speed up rendering
+            
+            # Calculate cell size based on maze dimensions
+            rows = len(maze)
+            cols = len(maze[0])
+            
+            cell_width = self.h / cols
+            cell_height = cell_width
+            
+            def draw_wall(x, y):
+                wall = turtle.Turtle()
+                wall.hideturtle()
+                wall.speed(0)
+                wall.penup()
+                wall.color("white")
+                wall.shape("square")
+                wall.shapesize(cell_height / 20, cell_width / 20)
+                wall.goto(x, y)
+                wall.stamp()
+                return wall
+            
+            self.Runing = True
+            self.clear_tempObj()
+            
+            self.temporary_obj.append(draw_wall(0* cell_width - (self.w//2), (self.h//2) - (start[1] + 1) * cell_height))
+            self.temporary_obj.append(draw_wall((end[0]+1)* cell_width - (self.w//2), (self.h//2) - (end[1] + 1) * cell_height))
+            
+            # Update and display the screen
+            self.screen.update()
+            self.screen.tracer(1)  # Re-enable screen updates
+            
+            self.cell_width = cell_width
+            self.turt_draw_path(self.m.find_sol(start, end))
             self.screen.listen()
             self.Runing = False
     
