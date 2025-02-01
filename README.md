@@ -2,6 +2,10 @@
 
 Maze Solver is a Python application that generates mazes, finds the shortest path between two points in the maze, and provides visualizations using the Turtle library.
 
+Uses:
+- Maze generation (Random Walk)
+- Path finding : A* Algorithm
+
 ## Features
 
 - **Maze Generation**: Utilizes Hunt and Kill algorithm to create random maze grids efficiently.
